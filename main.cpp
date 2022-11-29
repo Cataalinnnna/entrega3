@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <iostream>
@@ -138,7 +139,6 @@ void ReadFile(string namefile){
                 
                 if ( w == 0) {
                     cantVehiculos = stoi(word, nullptr,0);
-                    cout << "CANTIDAD DE VEHICULOS: " << cantVehiculos << endl;
                 }
                 if (w == 1){
                     capVehicle = stoi(word,nullptr,0);
@@ -147,8 +147,6 @@ void ReadFile(string namefile){
             }
 
             while (cantVehiculos > 0) {
-                cout << "agregando vehiculo..." << endl;
-
                 ListaVehicles.push_back(Vehicle(capVehicle));
                 cantVehiculos -= 1;
             }
@@ -175,14 +173,13 @@ void ReadFile(string namefile){
                         if(ListaNodos[i].tipo == 1){
                             
                             demandLHtotal += demand;
-                            cout<<"demandaaaa"<< demandLHtotal<<endl;
+                            
                         }
 
                         break;
                     }
                 }
-            }
-        
+              }
         i++;
         }
      
@@ -224,8 +221,6 @@ void generateADYmatrix(){
 
 
 pair<int, float> get_min_node(Vehicle truck, Nodo node){
-    //cout <<  "CURRENT NODE " << node<< endl;
-    //cout <<  "TRUCK " << truck << endl;
     float min_cost = infinite();
     Nodo tempnodo = Nodo(-1,-1,-1,-1);
     Nodo min_cost_node = tempnodo;
@@ -241,8 +236,11 @@ pair<int, float> get_min_node(Vehicle truck, Nodo node){
         float distancia = n.second;
 
         int index = FindIndexByID(id);
+        cout<<"index"<<endl;
+        cout<<index<<endl;
         
         Nodo n_values = ListaNodos[index];
+        cout<<ListaNodos[index]<<endl;
         if (n_values.visitado == true){
             continue;
         }
@@ -252,7 +250,7 @@ pair<int, float> get_min_node(Vehicle truck, Nodo node){
             continue;
         }
 
-        // no puedo recojer más inventario del máximo que tengo disponible
+        // no puedo recoger más inventario del máximo que tengo disponible
         if(n_values.tipo == 2 && n_values.demand > (truck.Maxcap - truck.Actualcap)){
             continue;
         }
@@ -267,7 +265,7 @@ pair<int, float> get_min_node(Vehicle truck, Nodo node){
         opciones.push_back(ListaNodos[0]);
     }
     for (auto m : opciones){
-    cout << "cantidad de opciones!: " << m.ID<< endl;
+    
         }
     if(opciones.size()==1 && opciones[0].tipo == 0 ){
         return std::make_pair(opciones[0].ID, 0);
@@ -294,13 +292,16 @@ pair<int, float> get_min_node(Vehicle truck, Nodo node){
         }
         
     }
-   
-    // if (id == -1) 
-        // return Nodes[0]
-    //cout<<"mincost node id"<<min_cost_node.ID<<endl;
+    
     return std::make_pair(FindIndexByID(min_cost_node.ID), min_cost);
 }
 
+void printroute(list<int> ruta){
+    for (auto const &i: ruta) {
+        std::cout << i <<" ";
+    }
+     cout<<endl;
+}
 
 int Greedy(){
     list <int> greedy_solution;
@@ -309,24 +310,21 @@ int Greedy(){
     int vehicules = 0;
     int time = 0;
 
-    cout << ListaVehicles.size()<<endl;
     for (int truck = 0 ; truck < ListaVehicles.size(); truck++){
          
 
-        // ListaVehicles[truck].Actualcap = min(demandLHtotal, ListaVehicles[truck].Maxcap);
+        ListaVehicles[truck].Actualcap = min(demandLHtotal, ListaVehicles[truck].Maxcap);
         if (demandLHtotal > ListaVehicles[truck].Maxcap) {
             ListaVehicles[truck].Actualcap = ListaVehicles[truck].Maxcap;
         }
         else {
             ListaVehicles[truck].Actualcap = demandLHtotal;
-            //cout<< ListaVehicles[truck].Actualcap<<endl;
         }
 
-        //cout << "Camion Actual: "<< truck<<endl;
         Nodo start = ListaNodos[0];
-        ///////////ver como arreglar lista vehicles para q funcione el greedy
+
         ListaVehicles[truck].add_to_route(start.ID);
-        //cout <<  "1.start: " << start.ID << endl;
+       
         Nodo current_node = start;
         bool flag = true; 
 
@@ -335,6 +333,7 @@ int Greedy(){
             pair<int, float> value = get_min_node(ListaVehicles[truck], current_node);
             
             int next_node_index = value.first ;
+            cout<<next_node_index<<endl;
             Nodo next_node = ListaNodos[next_node_index]; 
             
 
@@ -356,26 +355,17 @@ int Greedy(){
                 ListaVehicles[truck].backhaul_demand+= ListaNodos[next_node_index].demand;
                 ListaVehicles[truck].Actualcap+= ListaNodos[next_node_index].demand;
             }
-            
             ListaVehicles[truck].add_to_route(next_node.ID);
-           
-
-            
-            current_node = next_node;
-            //cout << "listaVehicles[truck] " << ListaVehicles[truck] << endl;
-            //cout <<  "current_node " << current_node<< endl;
-            //cout <<  "2. next_node: " << ListaNodos[next_node_index] << endl;
-            //cout <<  "2. current_node " << current_node<< endl;
-
-            
-            
+       
           
-            //cout << "ID: " << current_node<< endl;
-            //cout << "ID: " << *next_node<< endl;
-           if (current_node.ID == start.ID){
-            flag = false;
-           }
-           vehicules ++;
+            current_node = next_node;
+          
+         
+            if (current_node.ID == start.ID){
+                
+                flag = false;
+            }
+            vehicules ++;
             
             
             
@@ -394,23 +384,57 @@ int Greedy(){
 
 }
 
-void printroute(list<int> ruta){
-    for (auto const &i: ruta) {
-        std::cout << i <<" ";
-    }
-     cout<<endl;
-}
 
-//notas importantes para la cata y el seba del futuro
+
 
 //3. comenzar hc -> swap entre nodos de rutas.
 
 void EscribirArchivo(string file){
     ofstream archivo;
+    list <int>ruta;
+
     archivo.open(file+".out");
+    for (auto v : ListaVehicles){
+        for (auto const &i: v.route) {
+            
+            archivo<< i<<" ";
+        }
+        
+       
+        archivo<< v<<endl;
+            
+    }
+   
     cout <<endl;
 }
 
+/*void HillClimbing(){
+    
+    Nodo start = ListaNodos[0];
+    int depot = 0;
+    int IDNodoA;
+    int indexNodoB;
+    int ubi =0;
+    for (auto v : ListaVehicles){
+
+         for (auto const &i: v.route) {
+            //aqui voy a tener todos los id que son parte de las rutas
+            //while (depot <1){} ver que no sea el depot
+            IDNodoA = i;
+           while (ubi < ListaVehicles.size()){
+                 for (auto const &i: ListaVehicles[ubi+1].route){
+                    //obtendr-e los id de la siguiente solucion
+                    
+                 }
+           }
+             
+        
+        
+    
+        }
+      ubi++;\
+      }
+}*/
 
 int main(int argc, char *argv[]){
     printf("Ingrese nombre del archivo ");
@@ -419,21 +443,22 @@ int main(int argc, char *argv[]){
     std::cout<< "nombre del archivo ingresado: "<<file<<std::endl;
     ReadFile(file+".txt");
     generateADYmatrix();
-    for (auto v : adymatrix){
+    //Imprime matriz de adyacencia
+     /*for (auto v : adymatrix){
         for(auto w : adymatrix.at(v.first)){
         cout << adymatrix[v.first][w.first] << " ";
         }
         cout<< endl;
     
-    };
+    };*/
     Greedy();
     
-    /*cout << "RUTA: " << endl;
+    cout << "RUTA: " << endl;
     for (auto v : ListaVehicles){
         printroute(v.route);
         cout<<v<<endl;  
     }
-    cout <<endl;*/
+    cout <<endl;
     EscribirArchivo(file);
     return 0;
 }
