@@ -166,7 +166,7 @@ void ReadFile(string namefile){
                 } z++;
                 }
             
-                //Nodo& node = ListaNodos[ID];
+                Nodo& node = ListaNodos[ID];
                 for (int i = 0; i< ListaNodos.size(); i++){
                     if(ListaNodos[i].ID == ID){
                         ListaNodos[i].demand = demand;
@@ -305,10 +305,9 @@ void printroute(list<int> ruta){
 
 int Greedy(){
     list <int> greedy_solution;
-    int quality = 0;
-    int clients = 0;
+    
     int vehicules = 0;
-    int time = 0;
+    
 
     for (int truck = 0 ; truck < ListaVehicles.size(); truck++){
          
@@ -387,8 +386,6 @@ int Greedy(){
 
 
 
-//3. comenzar hc -> swap entre nodos de rutas.
-
 void EscribirArchivo(string file){
     ofstream archivo;
     list <int>ruta;
@@ -399,12 +396,8 @@ void EscribirArchivo(string file){
             
             archivo<< i<<" ";
         }
-        
-       
-        archivo<< v<<endl;
-            
+        archivo<< v<<endl; 
     }
-   
     cout <<endl;
 }
 
@@ -416,7 +409,6 @@ void EscribirArchivo(string file){
     int indexNodoB;
     int ubi =0;
     for (auto v : ListaVehicles){
-
          for (auto const &i: v.route) {
             //aqui voy a tener todos los id que son parte de las rutas
             //while (depot <1){} ver que no sea el depot
@@ -453,12 +445,6 @@ int main(int argc, char *argv[]){
     };*/
     Greedy();
     
-    cout << "RUTA: " << endl;
-    for (auto v : ListaVehicles){
-        printroute(v.route);
-        cout<<v<<endl;  
-    }
-    cout <<endl;
     EscribirArchivo(file);
     return 0;
 }
